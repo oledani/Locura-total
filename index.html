@@ -30,7 +30,7 @@ body::before {
         transparent 1px,
         transparent 4px
     );
-    animation: scan 7s linear infinite;
+    animation: scan 6s linear infinite;
 }
 @keyframes scan {
     from { transform: translateY(0); }
@@ -42,9 +42,9 @@ body::before {
     z-index: 2;
     border: 2px solid #00ffcc;
     padding: 30px;
-    max-width: 720px;
-    background: rgba(0,0,0,0.9);
-    box-shadow: 0 0 30px #00ffcc;
+    max-width: 740px;
+    background: rgba(0,0,0,0.92);
+    box-shadow: 0 0 35px #00ffcc;
 }
 
 .hidden { display: none; }
@@ -55,7 +55,6 @@ input {
     color: #00ffcc;
     padding: 10px;
     width: 80%;
-    margin-top: 10px;
 }
 
 button {
@@ -74,24 +73,23 @@ button:hover {
 .blink { animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-.glitch { animation: glitch 0.8s infinite; }
+.glitch { animation: glitch 0.7s infinite; }
 @keyframes glitch {
     0% { transform: translate(0); }
-    25% { transform: translate(-2px, 2px); }
-    50% { transform: translate(2px, -2px); }
+    25% { transform: translate(-3px, 2px); }
+    50% { transform: translate(3px, -2px); }
     75% { transform: translate(-2px, -2px); }
     100% { transform: translate(0); }
 }
 
-/* Cámara vigilancia */
+/* Cámara */
 .camera {
     position: absolute;
     top: 15px;
     right: 20px;
-    width: 40px;
-    height: 25px;
+    width: 42px;
+    height: 26px;
     border: 2px solid #00ffcc;
-    border-radius: 4px;
 }
 .camera::before {
     content: "";
@@ -101,7 +99,7 @@ button:hover {
     border: 2px solid #00ffcc;
     border-radius: 50%;
     top: 5px;
-    left: 12px;
+    left: 14px;
 }
 .camera::after {
     content: "REC";
@@ -113,86 +111,136 @@ button:hover {
     animation: blink 1s infinite;
 }
 
-/* Pulso vigilancia */
-.pulse {
-    animation: pulse 2s infinite;
+/* Flash cámara */
+.flash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
 }
-@keyframes pulse {
-    0% { box-shadow: 0 0 10px #00ffcc; }
-    50% { box-shadow: 0 0 30px #00ffcc; }
-    100% { box-shadow: 0 0 10px #00ffcc; }
+
+/* Ojos */
+.eye {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    top: 20px;
+}
+.eye.left { left: 20px; }
+.eye.right { right: 20px; }
+.pupil {
+    width: 10px;
+    height: 10px;
+    background: #00ffcc;
+    border-radius: 50%;
+    position: absolute;
+    top: 15px;
+    left: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Música hacker -->
+<div class="flash" id="flash"></div>
+
 <audio id="music" loop>
-    <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Monplaisir/Pripyat/Monplaisir_-_02_-_Escape.mp3" type="audio/mpeg">
+  <source src="musica.mp3" type="audio/mpeg">
 </audio>
 
-<div class="box pulse" id="login">
-    <div class="camera"></div>
+<div class="eye left"><div class="pupil"></div></div>
+<div class="eye right"><div class="pupil"></div></div>
 
+<div class="box" id="login">
+    <div class="camera"></div>
     <h1 class="blink glitch">ZONA RESTRINGIDA</h1>
     <p><strong>Locura total en casa de Alba y Rober</strong></p>
-    <p>Sistema de vigilancia activo</p>
-
-    <input type="password" id="password" placeholder="Contraseña de acceso">
+    <p id="randomText"></p>
+    <input type="password" id="password" placeholder="Contraseña">
     <br>
     <button onclick="checkPassword()">Verificar identidad</button>
     <p id="error" style="color:red;"></p>
 </div>
 
-<div class="box hidden pulse" id="countdownBox">
+<div class="box hidden" id="countdownBox">
     <div class="camera"></div>
     <h1 class="glitch">ACCESO CONCEDIDO</h1>
-    <p>Activación del protocolo en:</p>
     <h2 id="countdown">5</h2>
 </div>
 
-<div class="box hidden pulse" id="final">
+<div class="box hidden" id="final">
     <div class="camera"></div>
     <h1 class="blink glitch">ENHORABUENA</h1>
-    <p>
-        Has sido seleccionado como <strong>miembro secreto</strong><br>
-        del grupo nodriza:
-    </p>
     <h2>LOCURA TOTAL HACIA 2026</h2>
-    <p>
-        En casa de Alba y Rober<br><br>
-        <strong>📹 Ten cuidado porque te estamos observando.</strong>
-    </p>
+    <p><strong>📹 Te estamos observando.</strong></p>
 </div>
 
 <script>
+const mensajes = [
+    "Actividad monitorizada",
+    "Tu IP ha sido registrada",
+    "Sistema de vigilancia activo",
+    "No cierres esta página",
+    "Observando movimientos"
+];
+document.getElementById("randomText").textContent =
+    mensajes[Math.floor(Math.random()*mensajes.length)];
+
+function hablar(texto){
+    const msg = new SpeechSynthesisUtterance(texto);
+    msg.lang = "es-ES";
+    msg.rate = 0.85;
+    speechSynthesis.speak(msg);
+}
+
+function flashCam(){
+    const f = document.getElementById("flash");
+    f.style.opacity = "0.8";
+    setTimeout(()=>f.style.opacity="0",100);
+}
+
 function checkPassword() {
-    const pass = document.getElementById("password").value;
-    if (pass.toLowerCase() === "locura") {
+    if (document.getElementById("password").value.toLowerCase() === "locura") {
         document.getElementById("login").classList.add("hidden");
         document.getElementById("countdownBox").classList.remove("hidden");
         document.getElementById("music").play();
+        hablar("Te estamos observando");
         startCountdown();
     } else {
         document.getElementById("error").textContent =
-            "Acceso denegado. Actividad registrada.";
+            "Acceso denegado. Grabación iniciada.";
+        flashCam();
     }
 }
 
 function startCountdown() {
-    let time = 5;
-    const countdown = document.getElementById("countdown");
-    const interval = setInterval(() => {
-        time--;
-        countdown.textContent = time;
-        if (time === 0) {
-            clearInterval(interval);
+    let t = 5;
+    const c = document.getElementById("countdown");
+    const i = setInterval(()=>{
+        t--;
+        c.textContent = t;
+        if(t===0){
+            clearInterval(i);
             document.getElementById("countdownBox").classList.add("hidden");
             document.getElementById("final").classList.remove("hidden");
+            flashCam();
+            hablar("Bienvenido al sistema");
         }
-    }, 1000);
+    },1000);
 }
+
+document.addEventListener("mousemove", e => {
+    document.querySelectorAll(".eye").forEach(eye => {
+        const p = eye.querySelector(".pupil");
+        const r = eye.getBoundingClientRect();
+        const a = Math.atan2(e.clientY-r.top-20, e.clientX-r.left-20);
+        p.style.transform = `translate(${Math.cos(a)*8}px,${Math.sin(a)*8}px)`;
+    });
+});
 </script>
 
 </body>
