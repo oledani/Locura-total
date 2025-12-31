@@ -17,7 +17,7 @@ body {
     overflow: hidden;
 }
 
-/* Fondo animado */
+/* Fondo escáner */
 body::before {
     content: "";
     position: absolute;
@@ -42,9 +42,10 @@ body::before {
     position: relative;
     border: 2px solid #00ffcc;
     padding: 30px;
-    max-width: 700px;
+    max-width: 720px;
     box-shadow: 0 0 25px #00ffcc;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.88);
+    z-index: 2;
 }
 
 .hidden { display: none; }
@@ -72,21 +73,10 @@ button:hover {
     color: #000;
 }
 
-/* Parpadeo */
-.blink {
-    animation: blink 1s infinite;
-}
+.blink { animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 
-@keyframes blink {
-    50% { opacity: 0; }
-}
-
-/* Glitch */
-.glitch {
-    position: relative;
-    animation: glitch 1s infinite;
-}
-
+.glitch { animation: glitch 0.8s infinite; }
 @keyframes glitch {
     0% { transform: translate(0); }
     20% { transform: translate(-2px, 2px); }
@@ -94,6 +84,29 @@ button:hover {
     60% { transform: translate(-2px, -2px); }
     80% { transform: translate(2px, 2px); }
     100% { transform: translate(0); }
+}
+
+/* Ojos */
+.eye {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    top: 20px;
+}
+
+.eye.left { left: 20px; }
+.eye.right { right: 20px; }
+
+.pupil {
+    width: 10px;
+    height: 10px;
+    background: #00ffcc;
+    border-radius: 50%;
+    position: absolute;
+    top: 15px;
+    left: 15px;
 }
 </style>
 </head>
@@ -105,9 +118,13 @@ button:hover {
     <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Monplaisir/Pripyat/Monplaisir_-_02_-_Escape.mp3" type="audio/mpeg">
 </audio>
 
+<!-- Ojos observando -->
+<div class="eye left"><div class="pupil"></div></div>
+<div class="eye right"><div class="pupil"></div></div>
+
 <div class="box" id="login">
     <h1 class="blink glitch">ZONA RESTRINGIDA</h1>
-    <p>Locura total en casa de Alba y Rober</p>
+    <p><strong>Locura total en casa de Alba y Rober</strong></p>
     <p>Introduce la contraseña de acceso:</p>
     <input type="password" id="password" placeholder="Contraseña secreta">
     <br>
@@ -130,7 +147,8 @@ button:hover {
     <h2>LOCURA TOTAL HACIA 2026</h2>
     <p>
         Locura total en casa de Alba y Rober<br><br>
-        El caos ha comenzado.
+        <strong>Te estamos observando.</strong><br>
+        No cierres esta página.
     </p>
 </div>
 
@@ -161,6 +179,20 @@ function startCountdown() {
         }
     }, 1000);
 }
+
+/* Ojos siguiendo el ratón */
+document.addEventListener("mousemove", e => {
+    document.querySelectorAll(".eye").forEach(eye => {
+        const pupil = eye.querySelector(".pupil");
+        const rect = eye.getBoundingClientRect();
+        const x = e.clientX - rect.left - 20;
+        const y = e.clientY - rect.top - 20;
+        const angle = Math.atan2(y, x);
+        const moveX = Math.cos(angle) * 8;
+        const moveY = Math.sin(angle) * 8;
+        pupil.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+});
 </script>
 
 </body>
