@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>lalocuratotalencasadealbayrober</title>
+
+<style>
+body {
+    background: radial-gradient(circle, #001010, #000);
+    color: #00ffcc;
+    font-family: "Courier New", monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* Fondo escáner animado */
+body::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0,255,204,0.05),
+        rgba(0,255,204,0.05) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    animation: scan 7s linear infinite;
+}
+@keyframes scan {
+    from { transform: translateY(0); }
+    to { transform: translateY(-50%); }
+}
+
+.box {
+    position: relative;
+    z-index: 2;
+    border: 2px solid #00ffcc;
+    padding: 30px;
+    max-width: 720px;
+    background: rgba(0,0,0,0.9);
+    box-shadow: 0 0 30px #00ffcc;
+}
+
+.hidden { display: none; }
+
+input {
+    background: black;
+    border: 1px solid #00ffcc;
+    color: #00ffcc;
+    padding: 10px;
+    width: 80%;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 20px;
+    background: transparent;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+button:hover {
+    background: #00ffcc;
+    color: #000;
+}
+
+.blink { animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.glitch { animation: glitch 0.8s infinite; }
+@keyframes glitch {
+    0% { transform: translate(0); }
+    25% { transform: translate(-2px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.camera {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    width: 40px;
+    height: 25px;
+    border: 2px solid #00ffcc;
+    border-radius: 4px;
+}
+.camera::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    top: 5px;
+    left: 12px;
+}
+.camera::after {
+    content: "REC";
+    position: absolute;
+    top: -14px;
+    right: 0;
+    font-size: 10px;
+    color: red;
+    animation: blink 1s infinite;
+}
+
+.pulse { animation: pulse 2s infinite; }
+@keyframes pulse {
+    0% { box-shadow: 0 0 10px #00ffcc; }
+    50% { box-shadow: 0 0 30px #00ffcc; }
+    100% { box-shadow: 0 0 10px #00ffcc; }
+}
+
+/* Ojos que siguen al ratón */
+.eye {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #00ffcc;
+    border-radius: 50%;
+    top: 20px;
+}
+.eye.left { left: 20px; }
+.eye.right { right: 20px; }
+.pupil {
+    width: 10px;
+    height: 10px;
+    background: #00ffcc;
+    border-radius: 50%;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Música local -->
+<audio id="music" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Ojos de vigilancia -->
+<div class="eye left"><div class="pupil"></div></div>
+<div class="eye right"><div class="pupil"></div></div>
+
+<div class="box pulse" id="login">
+    <div class="camera"></div>
+    <h1 class="blink glitch">ZONA RESTRINGIDA</h1>
+    <p><strong>Locura total en casa de Alba y Rober</strong></p>
+    <p>Sistema de vigilancia activo</p>
+    <input type="password" id="password" placeholder="Contraseña de acceso">
+    <br>
+    <button onclick="checkPassword()">Verificar identidad</button>
+    <p id="error" style="color:red;"></p>
+</div>
+
+<div class="box hidden pulse" id="countdownBox">
+    <div class="camera"></div>
+    <h1 class="glitch">ACCESO CONCEDIDO</h1>
+    <p>Activación del protocolo en:</p>
+    <h2 id="countdown">5</h2>
+</div>
+
+<div class="box hidden pulse" id="final">
+    <div class="camera"></div>
+    <h1 class="blink glitch">ENHORABUENA</h1>
+    <p>
+        Has sido seleccionado como <strong>miembro secreto</strong><br>
+        del grupo nodriza:
+    </p>
+    <h2>LOCURA TOTAL HACIA 2026</h2>
+    <p>
+        Locura total en casa de Alba y Rober<br><br>
+        <strong>📹 Te estamos observando.</strong>
+    </p>
+</div>
+
+<script>
+function checkPassword() {
+    const pass = document.getElementById("password").value;
+    if (pass.toLowerCase() === "locura") {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("countdownBox").classList.remove("hidden");
+        document.getElementById("music").play();
+        startCountdown();
+    } else {
+        document.getElementById("error").textContent =
+            "Acceso denegado. Actividad registrada.";
+    }
+}
+
+function startCountdown() {
+    let time = 5;
+    const countdown = document.getElementById("countdown");
+    const interval = setInterval(() => {
+        time--;
+        countdown.textContent = time;
+        if (time === 0) {
+            clearInterval(interval);
+            document.getElementById("countdownBox").classList.add("hidden");
+            document.getElementById("final").classList.remove("hidden");
+        }
+    }, 1000);
+}
+
+// Ojos siguiendo al ratón
+document.addEventListener("mousemove", e => {
+    document.querySelectorAll(".eye").forEach(eye => {
+        const pupil = eye.querySelector(".pupil");
+        const rect = eye.getBoundingClientRect();
+        const x = e.clientX - rect.left - 20;
+        const y = e.clientY - rect.top - 20;
+        const angle = Math.atan2(y, x);
+        const moveX = Math.cos(angle) * 8;
+        const moveY = Math.sin(angle) * 8;
+        pupil.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    });
+});
+</script>
+
+</body>
+</html>
